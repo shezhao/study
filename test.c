@@ -2,34 +2,37 @@
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>
-#define MAX 10
+#define MAX 20
 typedef struct student{
     int income;
     int outgoing;
     char name[MAX];
     char id[MAX];
 }STUDENT ;
+
 STUDENT *Input(int n){
-    STUDENT *stu;
-    stu=(STUDENT*)malloc(sizeof(STUDENT)*(n+1));
-    if(stu==NULL){
-        printf("no enough memory!!!\n");
-        exit(0);
-    }
-    for (int i = 0; i < n; i++)
-    {
-        printf("please input the %d people data:\n",i+1);
-        printf("name>>");
-        scanf("%s",stu[i].name);
-        printf("id>>");
-        scanf("%s",stu[i].id);
-        printf("income>>");
-        scanf("%d",&stu[i].income);
-        getchar();
-        printf("outgoing>>");
-        scanf("%d",&stu[i].outgoing);
-        getchar();
-    }
+    int k=1;
+    int ans=0;
+    STUDENT *stu=NULL;
+    do{
+
+        if(k==0||ans>0) printf("the income or expenses must is number!!!\n");
+        k=1;ans=0;
+        stu=(STUDENT*)malloc(sizeof(STUDENT)*(n+1));
+        if(stu==NULL){
+            printf("no enough memory!!!\n");
+            exit(0);
+        }
+        for (int i = 0; i < n; i++)
+        {
+            scanf("%s",stu[i].id);scanf("%s",stu[i].name); k=(scanf("%d %d",&stu[i].income,&stu[i].outgoing));
+
+            char ch;
+            while((ch=getchar())!=EOF&&ch!='\n'){
+                ans++;
+            }
+        }
+    }while(k==0||ans>0);
     return stu;
 }
 STUDENT* Change(STUDENT *stu,int n){
@@ -42,17 +45,17 @@ STUDENT* Change(STUDENT *stu,int n){
             {
                 temp=stu[i];
                 stu[i]=stu[i+1];
-                stu[i+1]=temp; 
+                stu[i+1]=temp;
             }
         }
     }
     return stu;
 }
 void Display(STUDENT*stu,int n){
-    printf("name\tid\tincome\toutgoing\t\n");
+    printf("ID\tUserName\tIncome\tExpenses\t\n");
     for (int i = 0; i < n; i++)
     {
-        printf("%s\t%s\t%d\t%d\t\n",stu[i].name,stu[i].id,stu[i].income,stu[i].outgoing);
+        printf("%s\t%s\t\t%d\t%d\t\n",stu[i].id,stu[i].name,stu[i].income,stu[i].outgoing);
     }
 }
 double AverIn(STUDENT*stu,int n){
@@ -62,7 +65,7 @@ double AverIn(STUDENT*stu,int n){
         sum+=stu[i].income;
     }
     return(double)(sum*1.0/n);
-    
+
 }
 double AverOut(STUDENT*stu,int n){
     int sum=0;
@@ -72,29 +75,17 @@ double AverOut(STUDENT*stu,int n){
     }
     return(double)(sum*1.0/n);
 }
-void MaxIncome(STUDENT*stu,int n,double averIncome){
-    printf("under averIn :\n");
-    printf("name\tid\tincome\toutgoing\t\n");
-    for (int i = 0; i < n; i++)
-    {
-        if((double)(stu[i].income)>=averIncome)
-        {
-            printf("%s\t%s\t%d\t%d\t\n",stu[i].name,stu[i].id,stu[i].income,stu[i].outgoing);
-        }
-    }
-    
-}
 void MaxOut(STUDENT*stu,int n,double averOut){
     printf("under averOut :\n");
-    printf("name\tid\tincome\toutgoing\t\n");
+    printf("ID\tUserName\tIncome\tExpenses\t\n");
     for (int i = 0; i < n; i++)
     {
         if((double)(stu[i].outgoing)>=averOut)
         {
-            printf("%s\t%s\t%d\t%d\t\n",stu[i].name,stu[i].id,stu[i].income,stu[i].outgoing);
+            printf("%s\t%s\t\t%d\t%d\t\n",stu[i].id,stu[i].name,stu[i].income,stu[i].outgoing);
         }
     }
-    
+
 }
 void Menu(){
     printf("\n1. Input record\n");
@@ -103,45 +94,64 @@ void Menu(){
     printf("4. Calculate and list per capita income and expenses\n");
     printf("5. List records which have more expenses than per capita expenses\n");
     printf("6. List all records\n");
-    printf("0. Exit\n\t\tPlease enter your choice:");
+    printf("0. Exit\n");
 }
-void Find(STUDENT *stu,int n,char *name){
+int Find(STUDENT *stu,int n,char *name){
     int ans=1;
+    int count=0;
     for (int i = 0; i < n; i++)
     {
+        ans=1;
         for (int j = 0; j < strlen(stu[i].name); j++)
         {
             if(name[j]!=stu[i].name[j]) ans=0;
         }
         if(ans){
-            printf("name\tid\tincome\toutgoing\t\n");
-            printf("%s\t%s\t%d\t%d\t\n",stu[i].name,stu[i].id,stu[i].income,stu[i].outgoing);
+            printf("ID\tUserName\tIncome\tExpenses\t\n");
+            printf("%s\t%s\t\t%d\t%d\t\n",stu[i].id,stu[i].name,stu[i].income,stu[i].outgoing);
+            count =1;
         }
+
     }
+    return count;
 }
 
 int main (){
-    static int n=0;
-    int op;
+    static int n=1;
+    int op=-1;
     double in,out;
     int ans=0;
     STUDENT *stu=NULL;
-    FLAG:do{
+    do{
         if(ans>0){printf("\t\tplease input right number!!!\n");}
-        ans++;
-        Menu();
-        scanf("%d",&op);
-        getchar();
-    }while(op!=0&&op!=1&&op!=2&&op!=3&&op!=4&&op!=5&&op!=6);
         ans=0;
+        char ch;
+        Menu();
+        FLAG:op=-1;
+        printf("\t\tPlease enter your choice:");
+        scanf("%d",&op);
+        while((ch=getchar())!=EOF&&ch!='\n'){
+             ans++;
+        }
+    }while(ans>0);
+        ans=0;
+        int cont=0;
+        char cha;
         switch (op)
         {
             case 1:
-                printf("please input how many people>>");
-                scanf("%d",&n);
-                    getchar();
+
+                do{
+                    if(cont>0||(n>10||n<=0)){printf("\t\tplease input right number!!!(1-10)\n");}
+                    cont=0;
+                    printf("please input how many people>>");
+                    scanf("%d",&n);
+                    while((cha=getchar())!=EOF&&cha!='\n')
+                        {
+                        cont++;
+                        }
+                   }while(cont>0||(n>10||n<=0));
                     stu=Input(n);
-                    Display(stu,n);
                     goto FLAG;
             case 2:
                 if(stu==NULL){printf("no people!!!\n");goto FLAG;}
@@ -153,22 +163,20 @@ int main (){
                 printf("please input people's name>>");
                 char name[MAX];
                 scanf("%s",name);
-                Find(stu,n,name);
+                if((Find(stu,n,name))==0){
+                    printf("no find the people!!!\n");
+                }
                 goto FLAG;
             case 4:
                 if(stu==NULL){printf("no people!!!\n");goto FLAG;}
                 in =AverIn(stu,n);
                 out=AverOut(stu,n);
-                printf("AverIncome\tAverOut\t\n");
-                printf("%0.2f\t\t%0.2f\t\n",in,out);
+                printf("per capita income :\t%0.2f\nper capita expenses:\t%0.2f\t\n",in,out);
                 goto FLAG;
             case 5:
                 if(stu==NULL){printf("no people!!!\n");goto FLAG;}
                 in =AverIn(stu,n);
                 out=AverOut(stu,n);
-                printf("AverIncome\tAverOut\t\n");
-                printf("%0.2f\t\t%0.2f\t\n",in,out);
-                MaxIncome(stu,n,in);
                 MaxOut(stu,n,out);
                 goto FLAG;
             case 6:
@@ -177,6 +185,7 @@ int main (){
                 goto FLAG;
             case 0:
                 printf("exit system\n");
+                free(stu);
                 exit(0);
                 break;
         }
